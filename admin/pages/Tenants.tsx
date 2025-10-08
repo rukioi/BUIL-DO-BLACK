@@ -120,6 +120,33 @@ export function AdminTenants() {
       setError(err instanceof Error ? err.message : 'Failed to toggle tenant status');
     }
   };
+
+  const handleExtendPlan = async (tenant: Tenant) => {
+    const newDate = prompt('Digite a nova data de expiração (formato: YYYY-MM-DD):');
+    if (!newDate) return;
+
+    try {
+      setError(null);
+      const response = await fetch('/admin/tenants/' + tenant.id, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify({
+          planExpiresAt: new Date(newDate).toISOString()
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to update tenant');
+      
+      await loadTenants();
+      alert('Data de expiração atualizada com sucesso!');
+    } catch (err) {
+      console.error('Failed to extend plan:', err);
+      setError(err instanceof Error ? err.message : 'Failed to extend plan');
+    }
+  };
   const getPlanBadgeColor = (planType: string) => {
     switch (planType) {
       case 'enterprise':
@@ -285,9 +312,19 @@ export function AdminTenants() {
                               </Button>
                             </div>
                             {isExpired(tenant.planExpiresAt) && (
-                              <Badge variant="destructive" className="ml-1">
-                                Expired
-                              </Badge>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="destructive">
+                                  Expired
+                                </Badge>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleExtendPlan(tenant)}
+                                  className="text-xs"
+                                >
+                                  Renovar Plano
+                                </Button>
+                              </div>
                             )}
                           </TableCell>
                           <TableCell>

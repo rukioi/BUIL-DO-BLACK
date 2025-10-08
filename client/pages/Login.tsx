@@ -99,11 +99,26 @@ export function Login() {
         // Reload page to trigger AuthProvider to pick up the tokens
         window.location.href = '/';
       } else {
-        setErrorMessage(result.error || 'Email ou senha incorretos');
+        // Improved error handling for expired plan
+        const errorMessage = result.error || 'Email ou senha incorretos';
+        const errorType = result.errorType; // Assuming your API returns an errorType field
+
+        if (errorType === 'Plano expirado') {
+          setErrorMessage('🔒 Plano expirado! Sua conta não está mais ativa. Entre em contato com o administrador para renovar.');
+        } else {
+          setErrorMessage(errorMessage);
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
-      setErrorMessage('Erro ao conectar com servidor. Verifique sua conexão.');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to login';
+      const errorType = error.response?.data?.error;
+
+      if (errorType === 'Plano expirado') {
+        setErrorMessage('🔒 Plano expirado! Sua conta não está mais ativa. Entre em contato com o administrador para renovar.');
+      } else {
+        setErrorMessage(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -203,9 +218,9 @@ export function Login() {
               )}
 
               {errorMessage && (
-                <Alert variant="destructive" className={errorMessage.includes('Renove Sua Conta') ? 'border-orange-500 bg-orange-50' : ''}>
+                <Alert variant="destructive" className={errorMessage.includes('Renove Sua Conta') || errorMessage.includes('Plano expirado') ? 'border-orange-500 bg-orange-50' : ''}>
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription className={errorMessage.includes('Renove Sua Conta') ? 'text-orange-800 font-medium' : ''}>
+                  <AlertDescription className={errorMessage.includes('Renove Sua Conta') || errorMessage.includes('Plano expirado') ? 'text-orange-800 font-medium' : ''}>
                     {errorMessage}
                   </AlertDescription>
                 </Alert>

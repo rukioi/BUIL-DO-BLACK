@@ -23,9 +23,9 @@ export class AuthController {
   async register(req: Request, res: Response) {
     try {
       console.log('Registration attempt:', { email: req.body.email, name: req.body.name });
-      
+
       const validatedData = registerSchema.parse(req.body);
-      
+
       const { user, tokens, isNewTenant } = await authService.registerUser(
         validatedData.email,
         validatedData.password,
@@ -59,12 +59,34 @@ export class AuthController {
   async login(req: Request, res: Response) {
     try {
       console.log('Login attempt:', { email: req.body.email });
-      
+
       const validatedData = loginSchema.parse(req.body);
 
       const { user, tokens } = await authService.loginUser(validatedData.email, validatedData.password);
 
       console.log('Login successful:', { userId: user.id, tenantId: user.tenant_id });
+
+      // Verificar se o tenant está ativo
+    if (!user.tenant.isActive) {
+      return res.status(403).json({
+        error: 'Acesso negado',
+        message: 'Sua conta está inativa. Entre em contato com o administrador.',
+      });
+    }
+
+    // Verificar se o plano do tenant expirou
+    if (user.tenant.planExpiresAt) {
+      const expirationDate = new Date(user.tenant.planExpiresAt);
+      const now = new Date();
+
+      if (expirationDate < now) {
+        return res.status(403).json({
+          error: 'Plano expirado',
+          message: 'O plano da sua conta expirou em ' + expirationDate.toLocaleDateString('pt-BR') + '. Entre em contato com o administrador para renovar.',
+          expirationDate: expirationDate.toISOString(),
+        });
+      }
+    }
 
       res.json({
         message: 'Login successful',
@@ -129,7 +151,7 @@ export class AuthController {
   async getProfile(req: Request, res: Response) {
     try {
       const userId = (req as any).user?.id;
-      
+
       if (!userId) {
         return res.status(401).json({ error: 'Authentication required' });
       }

@@ -1,4 +1,3 @@
-
 import type { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { database } from '../config/database.js';
@@ -128,7 +127,7 @@ export const authenticateToken = async (req: AuthenticatedRequest, res: Response
         console.error('Token userId mismatch:', {decoded: decoded.userId, db: user.id});
         return res.status(403).json({ error: 'Token/user mismatch', code: 'AUTH_MISMATCH' });
       }
-      
+
       const userTenantId = String(user.tenantId || user.tenant_id);
       if (decoded.tenantId && decoded.tenantId !== userTenantId) {
         console.error('Token tenantId mismatch:', {decoded: decoded.tenantId, db: userTenantId});
@@ -143,7 +142,7 @@ export const authenticateToken = async (req: AuthenticatedRequest, res: Response
       accountType: String(user.accountType || user.account_type),
       name: String(user.name),
     };
-    
+
     // SEMPRE derivar tenantId do DB, NUNCA do token
     req.tenantId = String(user.tenantId || user.tenant_id);
 
@@ -159,12 +158,27 @@ export const authenticateToken = async (req: AuthenticatedRequest, res: Response
         });
       }
 
+      // Verificar se o tenant está ativo
       if (!tenant.isActive) {
         console.error('Inactive tenant for user:', user.id, 'tenantId:', req.tenantId);
-        return res.status(403).json({ 
-          error: 'Renove Sua Conta ou Entre em contato com o Administrador do Sistema',
-          code: 'TENANT_INACTIVE'
+        return res.status(403).json({
+          error: 'Acesso negado',
+          message: 'Sua conta está inativa. Entre em contato com o suporte para reativar.',
         });
+      }
+
+      // Verificar se o plano do tenant expirou
+      if (tenant.planExpiresAt) {
+        const expirationDate = new Date(tenant.planExpiresAt);
+        const now = new Date();
+
+        if (expirationDate < now) {
+          return res.status(403).json({
+            error: 'Plano expirado',
+            message: 'O plano da sua conta expirou. Entre em contato com o suporte para renovar.',
+            expirationDate: expirationDate.toISOString(),
+          });
+        }
       }
     }
 
