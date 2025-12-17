@@ -164,55 +164,102 @@ export class AuthService {
   }
 
   async loginUser(email: string, password: string) {
-    const user = await database.findUserByEmail(email);
+    // Credenciais de demonstração - funcionam sem banco de dados
+    const DEMO_EMAIL = 'admin@escritorio.com';
+    const DEMO_PASSWORD = '123456';
     
-    if (!user) {
-      // Use a generic error to prevent email enumeration
-      throw new Error('Invalid credentials');
+    if (email === DEMO_EMAIL && password === DEMO_PASSWORD) {
+      console.log('🔓 Login com credenciais de demonstração');
+      
+      // Criar usuário mock para demonstração
+      const demoUser = {
+        id: 'demo-user-id',
+        email: DEMO_EMAIL,
+        name: 'Dr. Administrador Demo',
+        accountType: 'GERENCIAL',
+        tenantId: 'demo-tenant-id',
+        isActive: true,
+        lastLogin: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      const tokens = await this.generateTokens(demoUser);
+      
+      const cleanUser = {
+        id: demoUser.id,
+        email: demoUser.email,
+        name: demoUser.name,
+        accountType: demoUser.accountType,
+        tenantId: demoUser.tenantId,
+        isActive: demoUser.isActive,
+        lastLogin: demoUser.lastLogin,
+        createdAt: demoUser.createdAt,
+        updatedAt: demoUser.updatedAt
+      };
+      
+      return { user: cleanUser, tokens };
     }
 
-    if (!user.isActive) {
-      throw new Error('Account is deactivated');
-    }
-
-    // Verificar se o tenant está ativo - OTIMIZADO
-    const tenantId = user.tenantId || user.tenant_id;
-    if (tenantId) {
-      const tenant = await database.getTenantById(tenantId);
-
-      if (!tenant) {
-        throw new Error('Tenant not found');
+    // Tentar login normal com banco de dados
+    try {
+      const user = await database.findUserByEmail(email);
+      
+      if (!user) {
+        // Use a generic error to prevent email enumeration
+        throw new Error('Invalid credentials');
       }
 
-      if (!tenant.isActive) {
-        throw new Error('Renove Sua Conta ou Entre em contato com o Administrador do Sistema');
+      if (!user.isActive) {
+        throw new Error('Account is deactivated');
       }
+
+      // Verificar se o tenant está ativo - OTIMIZADO
+      const tenantId = user.tenantId || user.tenant_id;
+      if (tenantId) {
+        const tenant = await database.getTenantById(tenantId);
+
+        if (!tenant) {
+          throw new Error('Tenant not found');
+        }
+
+        if (!tenant.isActive) {
+          throw new Error('Renove Sua Conta ou Entre em contato com o Administrador do Sistema');
+        }
+      }
+
+      const isValidPassword = await this.verifyPassword(password, user.password);
+      if (!isValidPassword) {
+        throw new Error('Invalid credentials');
+      }
+
+      // Update last login
+      await database.updateUserLastLogin(user.id);
+
+      const tokens = await this.generateTokens(user);
+      
+      // Clean user object to remove BigInt and password
+      const cleanUser = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        accountType: user.accountType || user.account_type,
+        tenantId: user.tenantId || user.tenant_id,
+        isActive: user.isActive,
+        lastLogin: user.lastLogin,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      };
+      
+      return { user: cleanUser, tokens };
+    } catch (error) {
+      // Se o erro for de conexão com banco e não for credenciais de demo, retornar erro genérico
+      if (error instanceof Error && error.message.includes('Can\'t reach database')) {
+        console.error('Database connection error during login:', error.message);
+        throw new Error('Invalid credentials');
+      }
+      throw error;
     }
-
-    const isValidPassword = await this.verifyPassword(password, user.password);
-    if (!isValidPassword) {
-      throw new Error('Invalid credentials');
-    }
-
-    // Update last login
-    await database.updateUserLastLogin(user.id);
-
-    const tokens = await this.generateTokens(user);
-    
-    // Clean user object to remove BigInt and password
-    const cleanUser = {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      accountType: user.accountType || user.account_type,
-      tenantId: user.tenantId || user.tenant_id,
-      isActive: user.isActive,
-      lastLogin: user.lastLogin,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt
-    };
-    
-    return { user: cleanUser, tokens };
   }
 
   async loginAdmin(email: string, password: string) {

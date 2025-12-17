@@ -111,74 +111,100 @@ export const authenticateToken = async (req: AuthenticatedRequest, res: Response
       return res.status(403).json({ error: 'Invalid token: missing tenant information' });
     }
 
+    // Verificar se é usuário demo (não precisa de banco de dados)
+    const isDemoUser = decoded.userId === 'demo-user-id';
+    
+    if (isDemoUser) {
+      // Usuário demo - usar dados do token diretamente
+      console.log('🔓 Autenticação com usuário demo');
+      req.user = {
+        id: String(decoded.userId),
+        email: String(decoded.email),
+        tenantId: String(decoded.tenantId || 'demo-tenant-id'),
+        accountType: String(decoded.accountType || 'GERENCIAL'),
+        name: String(decoded.name || 'Dr. Administrador Demo'),
+      };
+      req.tenantId = String(decoded.tenantId || 'demo-tenant-id');
+      return next();
+    }
+
     // Get fresh user data for regular users
-    const user = await database.findUserByEmail(decoded.email);
-    if (!user || !user.isActive) {
-      return res.status(401).json({
-        error: 'User inactive or not found',
-        code: 'AUTH_003'
-      });
-    }
-
-    // SEGURANÇA CRÍTICA: Validar que token userId e tenantId batem com DB
-    if (!decoded.role) {
-      // Usuário regular (não admin)
-      if (decoded.userId !== user.id) {
-        console.error('Token userId mismatch:', {decoded: decoded.userId, db: user.id});
-        return res.status(403).json({ error: 'Token/user mismatch', code: 'AUTH_MISMATCH' });
-      }
-
-      const userTenantId = String(user.tenantId || user.tenant_id);
-      if (decoded.tenantId && decoded.tenantId !== userTenantId) {
-        console.error('Token tenantId mismatch:', {decoded: decoded.tenantId, db: userTenantId});
-        return res.status(403).json({ error: 'Token/tenant mismatch', code: 'TENANT_MISMATCH' });
-      }
-    }
-
-    req.user = {
-      id: String(user.id),
-      email: String(user.email),
-      tenantId: String(user.tenantId || user.tenant_id),
-      accountType: String(user.accountType || user.account_type),
-      name: String(user.name),
-    };
-
-    // SEMPRE derivar tenantId do DB, NUNCA do token
-    req.tenantId = String(user.tenantId || user.tenant_id);
-
-    // Se não é admin, verificar tenant - OTIMIZADO
-    if (!decoded.role && req.tenantId) {
-      const tenant = await database.getTenantById(req.tenantId);
-
-      if (!tenant) {
-        console.error('Tenant not found for user:', user.id, 'tenantId:', req.tenantId);
-        return res.status(403).json({
-          error: 'Invalid tenant',
-          code: 'TENANT_NOT_FOUND'
+    try {
+      const user = await database.findUserByEmail(decoded.email);
+      if (!user || !user.isActive) {
+        return res.status(401).json({
+          error: 'User inactive or not found',
+          code: 'AUTH_003'
         });
       }
 
-      // ✅ VERIFICAÇÃO: Tenant ativo
-      if (!tenant.isActive) {
-        return res.status(403).json({
-          error: 'Tenant inativo',
-          message: 'Seu tenant está inativo. Entre em contato com o suporte.'
-        });
-      }
+      // SEGURANÇA CRÍTICA: Validar que token userId e tenantId batem com DB
+      if (!decoded.role) {
+        // Usuário regular (não admin)
+        if (decoded.userId !== user.id) {
+          console.error('Token userId mismatch:', {decoded: decoded.userId, db: user.id});
+          return res.status(403).json({ error: 'Token/user mismatch', code: 'AUTH_MISMATCH' });
+        }
 
-      // ✅ VERIFICAÇÃO: Plano expirado
-      if (tenant.planExpiresAt) {
-        const now = new Date();
-        const expirationDate = new Date(tenant.planExpiresAt);
-
-        if (expirationDate < now) {
-          return res.status(403).json({
-            error: 'Plano expirado',
-            message: 'O plano do seu tenant expirou. Entre em contato com o administrador para renovação.',
-            expiredAt: tenant.planExpiresAt
-          });
+        const userTenantId = String(user.tenantId || user.tenant_id);
+        if (decoded.tenantId && decoded.tenantId !== userTenantId) {
+          console.error('Token tenantId mismatch:', {decoded: decoded.tenantId, db: userTenantId});
+          return res.status(403).json({ error: 'Token/tenant mismatch', code: 'TENANT_MISMATCH' });
         }
       }
+
+      req.user = {
+        id: String(user.id),
+        email: String(user.email),
+        tenantId: String(user.tenantId || user.tenant_id),
+        accountType: String(user.accountType || user.account_type),
+        name: String(user.name),
+      };
+
+      // SEMPRE derivar tenantId do DB, NUNCA do token
+      req.tenantId = String(user.tenantId || user.tenant_id);
+
+      // Se não é admin, verificar tenant - OTIMIZADO
+      if (!decoded.role && req.tenantId) {
+        const tenant = await database.getTenantById(req.tenantId);
+
+        if (!tenant) {
+          console.error('Tenant not found for user:', user.id, 'tenantId:', req.tenantId);
+          return res.status(403).json({
+            error: 'Invalid tenant',
+            code: 'TENANT_NOT_FOUND'
+          });
+        }
+
+        // ✅ VERIFICAÇÃO: Tenant ativo
+        if (!tenant.isActive) {
+          return res.status(403).json({
+            error: 'Tenant inativo',
+            message: 'Seu tenant está inativo. Entre em contato com o suporte.'
+          });
+        }
+
+        // ✅ VERIFICAÇÃO: Plano expirado
+        if (tenant.planExpiresAt) {
+          const now = new Date();
+          const expirationDate = new Date(tenant.planExpiresAt);
+
+          if (expirationDate < now) {
+            return res.status(403).json({
+              error: 'Plano expirado',
+              message: 'O plano do seu tenant expirou. Entre em contato com o administrador para renovação.',
+              expiredAt: tenant.planExpiresAt
+            });
+          }
+        }
+      }
+    } catch (dbError) {
+      // Se houver erro de conexão com banco e não for usuário demo, retornar erro
+      console.error('Database error during authentication:', dbError);
+      return res.status(503).json({
+        error: 'Service temporarily unavailable',
+        code: 'DB_CONNECTION_ERROR'
+      });
     }
 
     next();

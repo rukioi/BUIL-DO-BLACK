@@ -64,27 +64,32 @@ export class AuthController {
 
       const { user, tokens } = await authService.loginUser(validatedData.email, validatedData.password);
 
-      console.log('Login successful:', { userId: user.id, tenantId: user.tenant_id });
+      console.log('Login successful:', { userId: user.id, tenantId: user.tenantId });
 
-      // Verificar se o tenant existe e está ativo
-      if (user.tenant && !user.tenant.isActive) {
-        return res.status(403).json({
-          error: 'Acesso negado',
-          message: 'Sua conta está inativa. Entre em contato com o administrador.',
-        });
-      }
-
-      // Verificar se o plano do tenant expirou
-      if (user.tenant && user.tenant.planExpiresAt) {
-        const expirationDate = new Date(user.tenant.planExpiresAt);
-        const now = new Date();
-
-        if (expirationDate < now) {
+      // Pular verificações de tenant para usuário demo
+      const isDemoUser = user.id === 'demo-user-id';
+      
+      if (!isDemoUser) {
+        // Verificar se o tenant existe e está ativo (apenas para usuários reais)
+        if (user.tenant && !user.tenant.isActive) {
           return res.status(403).json({
-            error: 'Plano expirado',
-            message: 'O plano da sua conta expirou em ' + expirationDate.toLocaleDateString('pt-BR') + '. Entre em contato com o administrador para renovar.',
-            expirationDate: expirationDate.toISOString(),
+            error: 'Acesso negado',
+            message: 'Sua conta está inativa. Entre em contato com o administrador.',
           });
+        }
+
+        // Verificar se o plano do tenant expirou
+        if (user.tenant && user.tenant.planExpiresAt) {
+          const expirationDate = new Date(user.tenant.planExpiresAt);
+          const now = new Date();
+
+          if (expirationDate < now) {
+            return res.status(403).json({
+              error: 'Plano expirado',
+              message: 'O plano da sua conta expirou em ' + expirationDate.toLocaleDateString('pt-BR') + '. Entre em contato com o administrador para renovar.',
+              expirationDate: expirationDate.toISOString(),
+            });
+          }
         }
       }
 

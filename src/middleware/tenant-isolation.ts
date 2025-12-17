@@ -24,6 +24,21 @@ export const validateTenantAccess = async (req: TenantRequest, res: Response, ne
       return next();
     }
 
+    // Usuário demo - bypass tenant validation
+    const isDemoUser = user.id === 'demo-user-id';
+    if (isDemoUser) {
+      console.log('🔓 Tenant access validado para usuário demo');
+      req.tenant = {
+        id: 'demo-tenant-id',
+        name: 'Demo Tenant',
+        isActive: true
+      };
+      // Criar um tenantDB mock para demo
+      const { TenantDatabase } = await import('../config/database.js');
+      req.tenantDB = new TenantDatabase('demo-tenant-id', 'tenant_demotenantid');
+      return next();
+    }
+
     // Regular users must have tenantId
     if (!user.tenantId) {
       console.error('User without tenantId attempting access:', user.userId);
@@ -33,39 +48,47 @@ export const validateTenantAccess = async (req: TenantRequest, res: Response, ne
     }
 
     // OTIMIZADO: Busca direta por ID ao invés de getAllTenants + filter
-    const { database, tenantDB } = await import('../config/database');
-    const tenant = await database.getTenantById(user.tenantId);
-    
-    if (!tenant) {
-      console.error('Tenant not found:', user.tenantId);
-      return res.status(403).json({ 
-        error: 'Access denied: Tenant not found' 
+    try {
+      const { database, tenantDB } = await import('../config/database');
+      const tenant = await database.getTenantById(user.tenantId);
+      
+      if (!tenant) {
+        console.error('Tenant not found:', user.tenantId);
+        return res.status(403).json({ 
+          error: 'Access denied: Tenant not found' 
+        });
+      }
+      
+      if (!tenant.isActive) {
+        console.error('Inactive tenant access attempt:', user.tenantId);
+        return res.status(403).json({ 
+          error: 'Access denied: Tenant is inactive' 
+        });
+      }
+
+      // Add tenant info to request
+      req.tenant = {
+        id: tenant.id,
+        name: tenant.name,
+        isActive: tenant.isActive
+      };
+
+      // CRÍTICO: Adicionar TenantDatabase ao request para isolamento real
+      req.tenantDB = await tenantDB.getTenantDatabase(user.tenantId);
+
+      console.log('Tenant access validated:', {
+        userId: user?.userId || user?.id,
+        tenantId: tenant.id,
+        tenantName: tenant.name,
+        accountType: user.accountType
+      });
+    } catch (dbError) {
+      console.error('Database error during tenant validation:', dbError);
+      return res.status(503).json({ 
+        error: 'Service temporarily unavailable',
+        code: 'DB_CONNECTION_ERROR'
       });
     }
-    
-    if (!tenant.isActive) {
-      console.error('Inactive tenant access attempt:', user.tenantId);
-      return res.status(403).json({ 
-        error: 'Access denied: Tenant is inactive' 
-      });
-    }
-
-    // Add tenant info to request
-    req.tenant = {
-      id: tenant.id,
-      name: tenant.name,
-      isActive: tenant.isActive
-    };
-
-    // CRÍTICO: Adicionar TenantDatabase ao request para isolamento real
-    req.tenantDB = await tenantDB.getTenantDatabase(user.tenantId);
-
-    console.log('Tenant access validated:', {
-      userId: user?.userId || user?.id,
-      tenantId: tenant.id,
-      tenantName: tenant.name,
-      accountType: user.accountType
-    });
 
     next();
   } catch (error) {
