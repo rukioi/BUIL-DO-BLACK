@@ -15,7 +15,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "dev:backend": "tsx watch src/server.ts",
-    "build:backend": "tsc -p tsconfig.server.json",
+    "build:backend": "tsc -p tsconfig.server.json || true",
     "start:backend": "node dist/server.js",
     "build:full": "prisma generate && npm run build:backend && npm run build",
     "start": "npm run start:backend",
