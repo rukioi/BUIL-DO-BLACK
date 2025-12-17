@@ -7,19 +7,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Import routes
-import authRoutes from './routes/auth';
-import dashboardRoutes from './routes/dashboard';
-import clientsRoutes from './routes/clients';
-import dealsRoutes from './routes/deals';
-import projectsRoutes from './routes/projects';
-import tasksRoutes from './routes/tasks';
-import transactionsRoutes from './routes/transactions';
-import invoicesRoutes from './routes/invoices';
-import settingsRoutes from './routes/settings';
-import adminRoutes from './routes/admin';
-import adminAuthRoutes from './routes/adminAuth';
-import notificationsRoutes from './routes/notifications';
-import publicationsRoutes from './routes/publications';
+import authRoutes from './routes/auth.js';
+import dashboardRoutes from './routes/dashboard.js';
+import clientsRoutes from './routes/clients.js';
+import dealsRoutes from './routes/deals.js';
+import projectsRoutes from './routes/projects.js';
+import tasksRoutes from './routes/tasks.js';
+import transactionsRoutes from './routes/transactions.js';
+import invoicesRoutes from './routes/invoices.js';
+import settingsRoutes from './routes/settings.js';
+import adminRoutes from './routes/admin.js';
+import adminAuthRoutes from './routes/adminAuth.js';
+import notificationsRoutes from './routes/notifications.js';
+import publicationsRoutes from './routes/publications.js';
 
 export function createApp() {
   const app = express();

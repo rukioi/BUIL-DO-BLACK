@@ -1,6 +1,6 @@
-import './env';
+import './env.js';
 import 'dotenv/config';
-import { createApp } from './app';
+import { createApp } from './app.js';
 
 const PORT = parseInt(process.env.PORT || '5000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
