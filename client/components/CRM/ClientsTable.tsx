@@ -51,13 +51,13 @@ export function ClientsTable({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        return 'bg-gradient-to-r from-[#22c55e] to-[#16a34a] text-white border-0';
       case 'inactive':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        return 'bg-gradient-to-r from-[#ef4444] to-[#dc2626] text-white border-0';
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+        return 'bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-white border-0';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+        return 'bg-[#27272a] text-gray-200 border border-[#3f3f46]';
     }
   };
 
@@ -75,7 +75,7 @@ export function ClientsTable({
   };
 
   return (
-    <div className="border rounded-lg">
+    <div className="rounded-lg">
       <Table>
         <TableHeader>
           <TableRow>

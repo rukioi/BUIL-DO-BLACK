@@ -451,7 +451,7 @@ export function CashFlow() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-6 colorbg-black dark:bg-gray-900 min-h-screen">
         {/* Breadcrumb Navigation */}
         <Breadcrumb>
           <BreadcrumbList>
@@ -504,7 +504,7 @@ export function CashFlow() {
                   Despesa
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleCreateRecurring}>
-                  <Repeat className="mr-2 h-4 w-4 text-blue-600" />
+                  <Repeat className="mr-2 h-4 w-4 text-[#9333ea]" />
                   Criar Recorrente
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -547,13 +547,13 @@ export function CashFlow() {
           </Card>
 
           {/* Card: Saldo */}
-          <Card className={`border-l-4 ${stats.balance >= 0 ? 'border-l-blue-500' : 'border-l-orange-500'}`}>
+          <Card className={`border-l-4 ${stats.balance >= 0 ? 'border-l-[#9333ea]' : 'border-l-[#f59e0b]'}`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">🏦 Saldo</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className={`text-2xl font-bold ${stats.balance >= 0 ? 'text-blue-600' : 'text-orange-600'}`}>
+              <div className={`text-2xl font-bold ${stats.balance >= 0 ? 'text-[#9333ea]' : 'text-[#f59e0b]'}`}>
                 {formatCurrency(stats.balance)}
               </div>
               <p className="text-xs text-muted-foreground">
@@ -600,8 +600,8 @@ export function CashFlow() {
           <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={handleCreateRecurring}>
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">
-                <div className="p-3 bg-blue-100 rounded-full">
-                  <Repeat className="h-6 w-6 text-blue-600" />
+                <div className="p-3 bg-[#9333ea]/20 rounded-full">
+                  <Repeat className="h-6 w-6 text-[#9333ea]" />
                 </div>
                 <div>
                   <h3 className="font-semibold">Criar Recorrente</h3>

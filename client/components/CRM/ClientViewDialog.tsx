@@ -65,11 +65,11 @@ export function ClientViewDialog({
 
   const getStatusColor = (status: string) => {
     const colors = {
-      active: 'bg-green-100 text-green-800',
-      inactive: 'bg-red-100 text-red-800',
-      pending: 'bg-yellow-100 text-yellow-800',
+      active: 'bg-gradient-to-r from-[#22c55e] to-[#16a34a] text-white border-0',
+      inactive: 'bg-gradient-to-r from-[#ef4444] to-[#dc2626] text-white border-0',
+      pending: 'bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-white border-0',
     };
-    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[status as keyof typeof colors] || 'bg-[#27272a] text-gray-200 border border-[#3f3f46]';
   };
 
   // Guard clause para evitar erros quando client é undefined
@@ -316,7 +316,7 @@ export function ClientViewDialog({
                 */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {/* Exemplo de arquivo - será dinâmico */}
-                  <div className="border rounded-lg p-3 hover:shadow-md transition-shadow">
+                  <div className="rounded-lg p-3 hover:shadow-md transition-shadow">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                         <FileText className="h-5 w-5 text-blue-600" />

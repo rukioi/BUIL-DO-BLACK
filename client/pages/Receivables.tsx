@@ -276,27 +276,23 @@ const getStatusBadge = (status: InvoiceStatus) => {
   const configs = {
     nova: {
       label: "Nova",
-      className:
-        "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+      className: "bg-gradient-to-r from-[#9333ea] to-[#a855f7] text-white border-0",
     },
     pendente: {
       label: "Pendente",
-      className: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+      className: "bg-gradient-to-r from-[#ef4444] to-[#dc2626] text-white border-0",
     },
     atribuida: {
       label: "Atribuída",
-      className:
-        "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+      className: "bg-gradient-to-r from-[#9333ea] to-[#c084fc] text-white border-0",
     },
     paga: {
       label: "Paga",
-      className:
-        "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+      className: "bg-gradient-to-r from-[#22c55e] to-[#16a34a] text-white border-0",
     },
     cancelada: {
       label: "Cancelada",
-      className:
-        "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
+      className: "bg-[#27272a] text-gray-200 border border-[#3f3f46]",
     },
     processando: {
       label: "Processando",
@@ -677,10 +673,10 @@ export function Receivables() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Pendentes</CardTitle>
-              <Clock className="h-4 w-4 text-yellow-600" />
+              <Clock className="h-4 w-4 text-[#c084fc]" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">
+              <div className="text-2xl font-bold text-[#c084fc]">
                 {mockDashboard.faturasPendentes}
               </div>
               <p className="text-xs text-muted-foreground">
@@ -774,14 +770,14 @@ export function Receivables() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md border">
+                <div className="rounded-md">
                   <Table>
                     <TableHeader>
                       <TableRow>
                         <TableHead className="w-12">
                           <input
                             type="checkbox"
-                            className="rounded border-gray-300"
+                            className="rounded border-[#3f3f46] bg-[#27272a]"
                             onChange={(e) => {
                               if (e.target.checked) {
                                 setSelectedInvoices(
@@ -834,7 +830,7 @@ export function Receivables() {
                               <TableCell>
                                 <input
                                   type="checkbox"
-                                  className="rounded border-gray-300"
+                                  className="rounded border-[#3f3f46] bg-[#27272a]"
                                   checked={selectedInvoices.includes(
                                     invoice.id,
                                   )}
@@ -860,7 +856,7 @@ export function Receivables() {
                                     {invoice.numeroFatura}
                                   </span>
                                   {invoice.recorrente && (
-                                    <div className="text-xs text-blue-600">
+                                    <div className="text-xs text-[#9333ea]">
                                       🔄 Recorrente
                                     </div>
                                   )}
@@ -1022,7 +1018,7 @@ export function Receivables() {
                   {getClientsFromInvoices().map((cliente) => (
                     <div
                       key={cliente.id}
-                      className="border rounded-lg p-4 hover:bg-muted/30 transition-colors"
+                      className="rounded-lg p-4 hover:bg-muted/30 transition-colors"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
@@ -1048,7 +1044,7 @@ export function Receivables() {
                             {cliente.email && (
                               <Badge
                                 variant="outline"
-                                className="text-blue-600"
+                                className="text-[#9333ea]"
                               >
                                 <Mail className="h-3 w-3 mr-1" />
                                 Email
@@ -1112,7 +1108,7 @@ export function Receivables() {
                     {notifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className="border rounded-lg p-4"
+                        className="rounded-lg p-4"
                       >
                         <div className="flex items-start justify-between">
                           <div className="space-y-2 flex-1">
@@ -1120,10 +1116,10 @@ export function Receivables() {
                               <Badge
                                 className={
                                   notification.status === "agendada"
-                                    ? "bg-blue-100 text-blue-800"
+                                    ? "bg-[#9333ea] text-white"
                                     : notification.status === "enviada"
-                                      ? "bg-green-100 text-green-800"
-                                      : "bg-yellow-100 text-yellow-800"
+                                      ? "bg-[#22c55e] text-white"
+                                      : "bg-[#c084fc] text-white"
                                 }
                               >
                                 {notification.status === "agendada"
@@ -1220,19 +1216,19 @@ export function Receivables() {
                       As notificações enviadas para clientes aparecerão aqui
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-                      <div className="p-4 border rounded-lg">
+                      <div className="p-4 rounded-lg">
                         <h4 className="font-medium">📅 Agendadas</h4>
                         <p className="text-sm text-muted-foreground">
                           Notificações programadas para envio futuro
                         </p>
                       </div>
-                      <div className="p-4 border rounded-lg">
+                      <div className="p-4 rounded-lg">
                         <h4 className="font-medium">✅ Enviadas</h4>
                         <p className="text-sm text-muted-foreground">
                           Notificações já enviadas aos clientes
                         </p>
                       </div>
-                      <div className="p-4 border rounded-lg">
+                      <div className="p-4 rounded-lg">
                         <h4 className="font-medium">⏳ Pendentes</h4>
                         <p className="text-sm text-muted-foreground">
                           Notificações aguardando processamento

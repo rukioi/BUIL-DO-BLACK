@@ -42,13 +42,12 @@ export function ProcessViewDialog({
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      "Em Andamento": "bg-blue-100 text-blue-800 border-blue-200",
-      "Aguardando Julgamento":
-        "bg-yellow-100 text-yellow-800 border-yellow-200",
-      Finalizado: "bg-green-100 text-green-800 border-green-200",
-      Suspenso: "bg-red-100 text-red-800 border-red-200",
+      "Em Andamento": "bg-[#9333ea] text-white",
+      "Aguardando Julgamento": "bg-[#c084fc] text-white",
+      Finalizado: "bg-[#22c55e] text-white",
+      Suspenso: "bg-[#ef4444] text-white",
     };
-    return colors[status] || "bg-gray-100 text-gray-800 border-gray-200";
+    return colors[status] || "bg-[#27272a] text-gray-400 border border-[#27272a]";
   };
 
   const handlePrint = () => {
@@ -72,7 +71,7 @@ export function ProcessViewDialog({
         <div className="flex-1 overflow-y-auto pr-4 min-h-0">
           <div className="space-y-6">
             {/* Cabeçalho com Status */}
-            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-[#1a1a1d] border border-[#27272a] rounded-lg">
               <div className="flex items-center space-x-4">
                 <Badge
                   className={`${getStatusColor(process.status)} px-3 py-1`}

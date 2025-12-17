@@ -691,7 +691,7 @@ export function ClientForm({ open, onOpenChange, client, onSubmit, isEditing = f
             {/* Upload de Arquivos */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Documentos do Cliente</h3>
-              <div className="border-2 border-dashed border-muted rounded-lg p-6">
+              <div className="border-2 border-dashed border-[#3f3f46] rounded-lg p-6">
                 <div className="flex flex-col items-center space-y-4">
                   <div className="text-center">
                     <p className="text-sm text-muted-foreground">
@@ -733,7 +733,7 @@ export function ClientForm({ open, onOpenChange, client, onSubmit, isEditing = f
                 </div>
 
                 {fileError && (
-                  <div className="mt-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                  <div className="mt-4 p-3 bg-[#7f1d1d] border border-[#991b1b] rounded-md">
                     <p className="text-sm text-destructive">{fileError}</p>
                   </div>
                 )}

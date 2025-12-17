@@ -38,17 +38,17 @@ interface ProjectKanbanProps {
 
 // STAGES IGUAIS AO CRM: Mesmo pipeline do CRM Pipeline de Vendas
 const statusConfig = {
-  contacted: { name: 'Em Contato', color: 'bg-blue-100 text-blue-800 border-blue-200' },
-  proposal: { name: 'Com Proposta', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
-  won: { name: 'Cliente Bem Sucedido', color: 'bg-green-100 text-green-800 border-green-200' },
-  lost: { name: 'Cliente Perdido', color: 'bg-red-100 text-red-800 border-red-200' },
+  contacted: { name: 'Em Contato', color: 'bg-[#9333ea] text-white' },
+  proposal: { name: 'Com Proposta', color: 'bg-[#c084fc] text-white' },
+  won: { name: 'Cliente Bem Sucedido', color: 'bg-[#22c55e] text-white' },
+  lost: { name: 'Cliente Perdido', color: 'bg-[#ef4444] text-white' },
 };
 
 const priorityConfig = {
-  low: { icon: '🔵', color: 'text-blue-600' },
-  medium: { icon: '🟡', color: 'text-yellow-600' },
-  high: { icon: '🟠', color: 'text-orange-600' },
-  urgent: { icon: '🔴', color: 'text-red-600' },
+  low: { icon: '🔵', color: 'text-[#9333ea]' },
+  medium: { icon: '🟡', color: 'text-[#c084fc]' },
+  high: { icon: '🟠', color: 'text-[#f59e0b]' },
+  urgent: { icon: '🔴', color: 'text-[#ef4444]' },
 };
 
 export function ProjectKanban({
@@ -216,12 +216,12 @@ export function ProjectKanban({
                   <Card
                     key={project.id}
                     className={`cursor-move hover:shadow-md transition-shadow border-l-4 ${
-                      pinnedProjects.has(project.id) ? 'ring-2 ring-blue-200 bg-blue-50/50' : ''
+                      pinnedProjects.has(project.id) ? 'ring-2 ring-[#9333ea] bg-[#1a1a1d]' : ''
                     }`}
-                    style={{ borderLeftColor: statusConfig[project.status]?.color.includes('blue') ? '#3b82f6' :
-                                             statusConfig[project.status]?.color.includes('yellow') ? '#f59e0b' :
-                                             statusConfig[project.status]?.color.includes('green') ? '#10b981' :
-                                             statusConfig[project.status]?.color.includes('red') ? '#ef4444' : '#6b7280' }}
+                    style={{ borderLeftColor: project.status === 'contacted' ? '#9333ea' :
+                                             project.status === 'proposal' ? '#c084fc' :
+                                             project.status === 'won' ? '#22c55e' :
+                                             project.status === 'lost' ? '#ef4444' : '#6b7280' }}
                     draggable
                     onDragStart={(e) => handleDragStart(e, project.id)}
                   >

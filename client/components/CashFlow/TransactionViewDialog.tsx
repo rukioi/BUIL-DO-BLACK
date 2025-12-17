@@ -286,7 +286,7 @@ export function TransactionViewDialog({
               <h3 className="text-lg font-semibold mb-3">Anexos</h3>
               <div className="space-y-2">
                 {transaction.attachments.map((attachment, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 border rounded">
+                  <div key={index} className="flex items-center justify-between p-2 rounded">
                     <span className="text-sm">{attachment}</span>
                     <Button variant="ghost" size="sm">
                       Download

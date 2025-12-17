@@ -67,11 +67,11 @@ const getActivityIcon = (type: string) => {
 
 const getActivityColor = (type: string) => {
   switch (type) {
-    case 'client': return 'text-blue-600';
-    case 'invoice': return 'text-yellow-600';
-    case 'project': return 'text-green-600';
-    case 'task': return 'text-purple-600';
-    default: return 'text-gray-600';
+    case 'client': return 'text-[#9333ea]';
+    case 'invoice': return 'text-[#c084fc]';
+    case 'project': return 'text-[#22c55e]';
+    case 'task': return 'text-[#a855f7]';
+    default: return 'text-gray-400';
   }
 };
 
@@ -222,13 +222,13 @@ export function Dashboard() {
 
       {/* Error Display */}
       {error && (
-        <Card className="border-red-200 bg-red-50">
+        <Card className="border-[#ef4444] bg-[#1a1a1d]">
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <AlertCircle className="h-5 w-5 text-red-600" />
+              <AlertCircle className="h-5 w-5 text-[#ef4444]" />
               <div>
-                <h3 className="font-medium text-red-800">Erro ao carregar dados</h3>
-                <p className="text-sm text-red-600">{error}</p>
+                <h3 className="font-medium text-[#ef4444]">Erro ao carregar dados</h3>
+                <p className="text-sm text-gray-300">{error}</p>
               </div>
             </div>
           </CardContent>
@@ -380,7 +380,7 @@ export function Dashboard() {
                         <Calendar className="h-3 w-3 inline mr-1" />
                         {project.date ? new Date(project.date).toLocaleDateString('pt-BR') : 'Data não disponível'}
                       </span>
-                      <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
+                      <span className="px-2 py-1 bg-[#27272a] text-[#9333ea] rounded-full border border-[#9333ea]/30">
                         {project.status || 'Em Andamento'}
                       </span>
                     </div>

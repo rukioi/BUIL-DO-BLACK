@@ -579,7 +579,7 @@ export function TransactionForm({
             {/* Seção: Configurações de Recorrência */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Recorrência</h3>
-              <div className="flex items-center space-x-2 p-4 border rounded-lg bg-muted/30">
+              <div className="flex items-center space-x-2 p-4 rounded-lg bg-muted/30">
                 <input
                   type="checkbox"
                   id="isRecurring"

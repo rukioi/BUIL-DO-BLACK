@@ -64,11 +64,11 @@ function TasksListView({
 }: TasksListViewProps) {
   const getStatusColor = (status: TaskStatus) => {
     const colors = {
-      not_started: 'bg-red-100 text-red-800',
-      in_progress: 'bg-yellow-100 text-yellow-800',
-      completed: 'bg-green-100 text-green-800',
-      on_hold: 'bg-gray-100 text-gray-800',
-      cancelled: 'bg-red-100 text-red-800'
+      not_started: 'bg-[#ef4444] text-white',
+      in_progress: 'bg-[#c084fc] text-white',
+      completed: 'bg-[#22c55e] text-white',
+      on_hold: 'bg-[#27272a] text-gray-400',
+      cancelled: 'bg-[#ef4444] text-white'
     };
     return colors[status] || colors.not_started;
   };
@@ -86,10 +86,10 @@ function TasksListView({
 
   const getPriorityColor = (priority: TaskPriority) => {
     const colors = {
-      low: 'text-gray-600',
-      medium: 'text-blue-600',
-      high: 'text-orange-600',
-      urgent: 'text-red-600'
+      low: 'text-gray-400',
+      medium: 'text-[#9333ea]',
+      high: 'text-[#f59e0b]',
+      urgent: 'text-[#ef4444]'
     };
     return colors[priority] || colors.medium;
   };

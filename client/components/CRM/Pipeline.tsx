@@ -342,7 +342,7 @@ export function Pipeline({ stages, onAddDeal, onEditDeal, onDeleteDeal, onMoveDe
 
               {/* CONTROLES DE PAGINAÇÃO */}
               {stage.deals.length > CARDS_PER_PAGE && (
-                <div className="flex items-center justify-between pt-3 border-t">
+                <div className="flex items-center justify-between pt-3">
                   <Button
                     size="sm"
                     variant="ghost"

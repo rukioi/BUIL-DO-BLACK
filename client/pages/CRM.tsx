@@ -121,13 +121,13 @@ function PipelineListView({
 
   const getStageColor = (color: string) => {
     const colors = {
-      blue: "bg-blue-100 text-blue-800",
-      yellow: "bg-yellow-100 text-yellow-800",
-      purple: "bg-purple-100 text-purple-800",
-      orange: "bg-orange-100 text-orange-800",
-      green: "bg-green-100 text-green-800",
-      red: "bg-red-100 text-red-800",
-      gray: "bg-gray-100 text-gray-800",
+      blue: "bg-[#9333ea] text-white",
+      yellow: "bg-[#c084fc] text-white",
+      purple: "bg-[#a855f7] text-white",
+      orange: "bg-[#f59e0b] text-white",
+      green: "bg-[#22c55e] text-white",
+      red: "bg-[#ef4444] text-white",
+      gray: "bg-[#27272a] text-gray-400",
     };
     return colors[color] || colors.gray;
   };
@@ -546,7 +546,7 @@ export function CRM() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 p-6">
+      <div className="space-y-6 p-6 bgcolor-black dark:bg-gray-900 min-h-screen">
         {/* Breadcrumb */}
         <Breadcrumb>
           <BreadcrumbList>
@@ -741,7 +741,7 @@ export function CRM() {
                   </CardTitle>
                   <div className="flex items-center space-x-2">
                     {/* View Mode Toggle */}
-                    <div className="flex border rounded-lg p-1">
+                    <div className="flex rounded-lg p-1">
                       <Button
                         variant={
                           pipelineViewMode === "kanban" ? "default" : "ghost"

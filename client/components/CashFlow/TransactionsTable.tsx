@@ -146,7 +146,7 @@ export function TransactionsTable({
   };
 
   return (
-    <div className="border rounded-lg">
+    <div className="rounded-lg">
       <Table>
         <TableHeader>
           <TableRow>

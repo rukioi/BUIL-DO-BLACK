@@ -1,9 +1,31 @@
 import React, { useState, useMemo } from 'react';
+import {
+  FolderKanban,
+  Plus,
+  Search,
+  BarChart3,
+  Clock,
+  TrendingUp,
+  AlertTriangle,
+  Grid3X3,
+  List,
+  MoreHorizontal,
+  Eye,
+  Edit,
+  Trash2,
+} from 'lucide-react';
 import { DashboardLayout } from '@/components/Layout/DashboardLayout';
 import { UIErrorBoundary } from '@/lib/error-boundary';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,40 +35,19 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import {
-  FolderKanban,
-  Plus,
-  Search,
-  Filter,
-  BarChart3,
-  Clock,
-  TrendingUp,
-  AlertTriangle,
-  Grid3X3,
-  List
-} from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
 import { ProjectForm } from '@/components/Projects/ProjectForm';
 import { ProjectKanban } from '@/components/Projects/ProjectKanban';
 import { ProjectViewDialog } from '@/components/Projects/ProjectViewDialog';
 import { Project as ProjectType, useProjects } from '@/hooks/useProjects';
 import { ProjectStage, ProjectStatus } from '@/types/projects';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Eye, Edit, Trash2 } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
 // Helper para mapear Project do hook para tipos do frontend
@@ -77,15 +78,15 @@ function ProjectCompactView({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'contacted':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-[#9333ea] text-white';
       case 'proposal':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-[#c084fc] text-white';
       case 'won':
-        return 'bg-green-100 text-green-800';
+        return 'bg-[#22c55e] text-white';
       case 'lost':
-        return 'bg-red-100 text-red-800';
+        return 'bg-[#ef4444] text-white';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-[#27272a] text-gray-400';
     }
   };
 
@@ -107,13 +108,13 @@ function ProjectCompactView({
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high':
-        return 'bg-red-100 text-red-800';
+        return 'bg-[#ef4444] text-white';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-[#c084fc] text-white';
       case 'low':
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-[#27272a] text-gray-400';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-[#27272a] text-gray-400';
     }
   };
 
@@ -364,7 +365,7 @@ function ProjectsContent() {
             </p>
           </div>
           <div className="flex space-x-2">
-            <div className="flex border rounded-lg p-1">
+            <div className="flex rounded-lg p-1">
               <Button
                 variant={viewMode === 'kanban' ? 'default' : 'ghost'}
                 size="sm"

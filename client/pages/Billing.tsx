@@ -1040,7 +1040,7 @@ export function Billing() {
             variant="default"
             onClick={handleOpenEmailModal}
             disabled={selectedDocs.length === 0}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-[#9333ea] hover:bg-[#a855f7]"
           >
             <Mail className="h-4 w-4 mr-2" />
             Enviar Email {selectedDocs.length > 0 && `(${selectedDocs.length})`}

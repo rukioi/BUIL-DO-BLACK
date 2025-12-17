@@ -790,8 +790,8 @@ export function Settings() {
                         className="hidden"
                       />
                     </div>
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                      <p className="text-xs text-yellow-800">
+                    <div className="bg-[#27272a] border border-[#3f3f46] rounded-xl p-4">
+                      <p className="text-xs text-gray-300">
                         <strong>⚠️ Formato esperado:</strong> Nome, Email,
                         Telefone, País, Estado, Endereço, Cidade, CEP, CPF, RG
                       </p>

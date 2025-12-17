@@ -78,10 +78,10 @@ export function AdminDashboard() {
   if (isLoading && !metrics) {
     return (
       <AdminLayout>
-        <div className="space-y-6 p-6">
+        <div className="p-6 space-y-6 bg-black text-white min-h-screen">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Dashboard</h1>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-black">Dashboard</h1>
               <p className="text-slate-600 dark:text-slate-400 mt-1">System overview and global metrics</p>
             </div>
             <Button onClick={loadMetrics} disabled={isLoading} variant="outline" className="shadow-sm">

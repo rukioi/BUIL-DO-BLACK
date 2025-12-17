@@ -250,7 +250,7 @@ export function DealViewDialog({
             */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Exemplo de arquivo - será dinâmico baseado nos documentos anexados */}
-              <div className="border rounded-lg p-3 hover:shadow-md transition-shadow">
+              <div className="rounded-lg p-3 hover:shadow-md transition-shadow">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                     <FileText className="h-5 w-5 text-green-600" />
@@ -270,7 +270,7 @@ export function DealViewDialog({
                 </div>
               </div>
 
-              <div className="border rounded-lg p-3 hover:shadow-md transition-shadow">
+              <div className="rounded-lg p-3 hover:shadow-md transition-shadow">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                     <FileText className="h-5 w-5 text-blue-600" />

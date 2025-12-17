@@ -90,15 +90,15 @@ export function ProjectViewDialog({
 
   const getStatusColor = (status: string) => {
     const colors = {
-      planejamento: 'bg-blue-100 text-blue-800',
-      andamento: 'bg-yellow-100 text-yellow-800',
-      revisao: 'bg-purple-100 text-purple-800',
-      aguardando_cliente: 'bg-orange-100 text-orange-800',
-      concluido: 'bg-green-100 text-green-800',
-      cancelado: 'bg-red-100 text-red-800',
-      arquivado: 'bg-gray-100 text-gray-800',
+      planejamento: 'bg-[#9333ea] text-white',
+      andamento: 'bg-[#c084fc] text-white',
+      revisao: 'bg-[#a855f7] text-white',
+      aguardando_cliente: 'bg-[#f59e0b] text-white',
+      concluido: 'bg-[#22c55e] text-white',
+      cancelado: 'bg-[#ef4444] text-white',
+      arquivado: 'bg-[#27272a] text-gray-400',
     };
-    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[status as keyof typeof colors] || 'bg-[#27272a] text-gray-400';
   };
 
   const getPriorityLabel = (priority: string) => {
@@ -113,12 +113,12 @@ export function ProjectViewDialog({
 
   const getPriorityColor = (priority: string) => {
     const colors = {
-      low: 'bg-gray-100 text-gray-800',
-      medium: 'bg-blue-100 text-blue-800',
-      high: 'bg-orange-100 text-orange-800',
-      urgent: 'bg-red-100 text-red-800',
+      low: 'bg-[#27272a] text-gray-400',
+      medium: 'bg-[#c084fc] text-white',
+      high: 'bg-[#f59e0b] text-white',
+      urgent: 'bg-[#ef4444] text-white',
     };
-    return colors[priority as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[priority as keyof typeof colors] || 'bg-[#27272a] text-gray-400';
   };
 
   const isOverdue = new Date(project.dueDate) < new Date() && 
@@ -130,7 +130,7 @@ export function ProjectViewDialog({
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <FolderKanban className="h-8 w-8 text-blue-600" />
+              <FolderKanban className="h-8 w-8 text-[#9333ea]" />
               <div>
                 <DialogTitle className="text-xl">{project.title}</DialogTitle>
                 <DialogDescription className="space-y-2">
@@ -374,15 +374,15 @@ export function ProjectViewDialog({
                 */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {project.files.map((file, index) => (
-                    <div key={file.id || index} className="border rounded-lg p-3 hover:shadow-md transition-shadow">
+                    <div key={file.id || index} className="border border-[#27272a] rounded-lg p-3 hover:shadow-md transition-shadow bg-[#1a1a1d]">
                       <div className="flex items-center space-x-3">
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          file.type?.includes('pdf') ? 'bg-red-100' :
-                          file.type?.includes('image') ? 'bg-blue-100' : 'bg-gray-100'
+                          file.type?.includes('pdf') ? 'bg-[#ef4444]/20' :
+                          file.type?.includes('image') ? 'bg-[#9333ea]/20' : 'bg-[#27272a]'
                         }`}>
                           <FileText className={`h-5 w-5 ${
-                            file.type?.includes('pdf') ? 'text-red-600' :
-                            file.type?.includes('image') ? 'text-blue-600' : 'text-gray-600'
+                            file.type?.includes('pdf') ? 'text-[#ef4444]' :
+                            file.type?.includes('image') ? 'text-[#9333ea]' : 'text-gray-400'
                           }`} />
                         </div>
                         <div className="flex-1 min-w-0">

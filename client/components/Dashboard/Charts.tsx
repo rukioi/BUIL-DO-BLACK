@@ -11,7 +11,6 @@ import {
   Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
   Legend,
@@ -208,7 +207,6 @@ export function DashboardCharts({ className }: ChartsProps) {
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={monthlyFinancialData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <CustomXAxis dataKey="month" />
               <CustomYAxis tickFormatter={formatCurrency} width={80} />
               <Tooltip content={<CustomTooltip />} />
@@ -350,7 +348,6 @@ export function DashboardCharts({ className }: ChartsProps) {
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={clientsByStatus}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <CustomXAxis
                 dataKey="status"
                 angle={-45}
@@ -377,7 +374,6 @@ export function DashboardCharts({ className }: ChartsProps) {
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={clientsGrowth}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <CustomXAxis dataKey="month" />
               <CustomYAxis />
               <Tooltip content={<CustomTooltip />} />

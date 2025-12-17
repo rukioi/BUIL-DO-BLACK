@@ -119,30 +119,27 @@ const getStatusBadge = (status: PublicationStatus) => {
     nova: {
       label: "Nova",
       variant: "default" as const,
-      color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+      color: "bg-[#9333ea] text-white",
     },
     pendente: {
       label: "Pendente",
       variant: "secondary" as const,
-      color:
-        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+      color: "bg-[#c084fc] text-white",
     },
     atribuida: {
       label: "Atribuída",
       variant: "outline" as const,
-      color:
-        "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+      color: "bg-[#27272a] text-[#9333ea] border border-[#9333ea]",
     },
     finalizada: {
       label: "Finalizada",
       variant: "outline" as const,
-      color:
-        "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+      color: "bg-[#22c55e] text-white",
     },
     descartada: {
       label: "Descartada",
       variant: "destructive" as const,
-      color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+      color: "bg-[#ef4444] text-white",
     },
   };
 
@@ -152,13 +149,13 @@ const getStatusBadge = (status: PublicationStatus) => {
 const getUrgencyColor = (urgencia?: string) => {
   switch (urgencia) {
     case "alta":
-      return "text-red-600";
+      return "text-[#ef4444]";
     case "media":
-      return "text-yellow-600";
+      return "text-[#c084fc]";
     case "baixa":
-      return "text-green-600";
+      return "text-[#22c55e]";
     default:
-      return "text-gray-600";
+      return "text-gray-400";
   }
 };
 
@@ -420,14 +417,13 @@ export function Publications() {
 
   const getProcessStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      "Em Andamento": "bg-blue-100 text-blue-800 border-blue-200",
-      "Aguardando Documentos":
-        "bg-yellow-100 text-yellow-800 border-yellow-200",
-      Finalizado: "bg-green-100 text-green-800 border-green-200",
-      Arquivado: "bg-gray-100 text-gray-800 border-gray-200",
-      Suspenso: "bg-red-100 text-red-800 border-red-200",
+      "Em Andamento": "bg-[#9333ea] text-white",
+      "Aguardando Documentos": "bg-[#c084fc] text-white",
+      Finalizado: "bg-[#22c55e] text-white",
+      Arquivado: "bg-[#27272a] text-gray-400 border border-[#27272a]",
+      Suspenso: "bg-[#ef4444] text-white",
     };
-    return colors[status] || "bg-gray-100 text-gray-800 border-gray-200";
+    return colors[status] || "bg-[#27272a] text-gray-400 border border-[#27272a]";
   };
 
   // Carregar projetos arquivados na inicialização
@@ -505,7 +501,7 @@ export function Publications() {
                       size="sm"
                       variant="outline"
                       onClick={handleCreate5DayTask}
-                      className="bg-green-50 hover:bg-green-100 border-green-200"
+                      className="bg-[#27272a] hover:bg-[#1a1a1d] border-[#22c55e] text-[#22c55e]"
                     >
                       <Calendar className="h-4 w-4 mr-2" />
                       Prazo 5 Dias
@@ -538,7 +534,7 @@ export function Publications() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md border">
+                <div className="rounded-md">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -714,10 +710,10 @@ export function Publications() {
                   </div>
 
                   {/* Informações sobre a consulta */}
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <div className="bg-[#1a1a1d] p-4 rounded-lg border border-[#27272a]">
                     <div className="flex items-start space-x-3">
-                      <Scale className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                      <div className="text-sm text-blue-800 dark:text-blue-200">
+                      <Scale className="h-5 w-5 text-[#9333ea] mt-0.5 flex-shrink-0" />
+                      <div className="text-sm text-gray-200">
                         <p className="font-medium mb-1">
                           Como funciona a consulta:
                         </p>
@@ -762,7 +758,7 @@ export function Publications() {
                       </h3>
                       <Badge
                         variant="outline"
-                        className="text-green-600 border-green-600"
+                        className="text-[#22c55e] border-[#22c55e]"
                       >
                         Consulta realizada com sucesso
                       </Badge>
@@ -773,7 +769,7 @@ export function Publications() {
                       {searchResults.map((project) => (
                         <div
                           key={project.id}
-                          className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white dark:bg-card"
+                          className="border border-[#27272a] rounded-lg p-4 hover:shadow-md transition-shadow bg-[#1a1a1d]"
                         >
                           {/* Header do Card */}
                           <div className="flex items-center justify-between mb-3">
@@ -806,17 +802,17 @@ export function Publications() {
                               CLIENTE
                             </span>
                             <div className="font-medium text-sm mt-1">
-                              <span className="text-blue-600">
+                              <span className="text-[#9333ea]">
                                 {project.cliente}
                               </span>
                             </div>
-                            <div className="text-xs text-green-600 font-medium mt-1">
+                            <div className="text-xs text-[#22c55e] font-medium mt-1">
                               VISUALIZAR PROJETO
                             </div>
                           </div>
 
                           {/* Informações Adicionais */}
-                          <div className="mt-3 pt-3 border-t space-y-2">
+                          <div className="mt-3 pt-3 border-t border-[#27272a] space-y-2">
                             <div className="text-xs text-muted-foreground">
                               <strong>Número:</strong> {project.numero}
                             </div>
@@ -836,7 +832,7 @@ export function Publications() {
                             <div className="mt-3 pt-2">
                               <Button
                                 size="sm"
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                                className="w-full bg-[#9333ea] hover:bg-[#a855f7] text-white"
                                 onClick={() =>
                                   handleViewProcessDetails(project)
                                 }
@@ -903,7 +899,7 @@ export function Publications() {
                       {archivedProjects.map((project) => (
                         <div
                           key={project.id}
-                          className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-gray-50 dark:bg-gray-800"
+                          className="border border-[#27272a] rounded-lg p-4 hover:shadow-md transition-shadow bg-[#1a1a1d]"
                         >
                           {/* Header do Card */}
                           <div className="flex items-center justify-between mb-3">
@@ -936,24 +932,24 @@ export function Publications() {
                               CLIENTE
                             </span>
                             <div className="font-medium text-sm mt-1">
-                              <span className="text-blue-600">
+                              <span className="text-[#9333ea]">
                                 {project.cliente}
                               </span>
                             </div>
-                            <div className="text-xs text-green-600 font-medium mt-1">
+                            <div className="text-xs text-[#22c55e] font-medium mt-1">
                               VISUALIZAR PROJETO
                             </div>
                           </div>
 
                           {/* Status de Arquivado */}
                           <div className="mb-3">
-                            <Badge className="bg-gray-100 text-gray-800 border-gray-200 text-xs">
+                            <Badge className="bg-[#27272a] text-gray-400 border border-[#27272a] text-xs">
                               📁 Arquivado
                             </Badge>
                           </div>
 
                           {/* Informações Adicionais */}
-                          <div className="mt-3 pt-3 border-t space-y-2">
+                          <div className="mt-3 pt-3 border-t border-[#27272a] space-y-2">
                             <div className="text-xs text-muted-foreground">
                               <strong>Número:</strong> {project.numero}
                             </div>

@@ -4,17 +4,17 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-full border-0 px-3 py-1.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-[rgba(147,51,234,0.4)] focus:ring-offset-2",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+          "bg-gradient-to-r from-[#9333ea] to-[#a855f7] text-white shadow-[0_2px_10px_rgba(147,51,234,0.4)] hover:from-[#a855f7] hover:to-[#c084fc]",
         secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "bg-[#27272a] text-gray-200 border border-[#3f3f46] hover:bg-[#3f3f46]",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
+          "bg-gradient-to-r from-[#ef4444] to-[#dc2626] text-white shadow-[0_2px_10px_rgba(239,68,68,0.4)] hover:from-[#dc2626] hover:to-[#b91c1c]",
+        outline: "text-gray-200 border-2 border-[#3f3f46] bg-[#1a1a1d] hover:bg-[#27272a] hover:border-[#9333ea]",
       },
     },
     defaultVariants: {
