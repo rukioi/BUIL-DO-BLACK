@@ -99,11 +99,6 @@ class ApiService {
     return false;
   }
 
-  setToken(token: string) {
-    this.token = token;
-    localStorage.setItem('access_token', token);
-  }
-
   clearToken() {
     this.token = null;
     localStorage.removeItem('access_token');

@@ -92,7 +92,7 @@ const mockDashboard: DashboardRecebiveis = {
   tempoMedioPagamento: 8,
   notificacoesAgendadas: 6,
   faturas3Dias: [],
-  faturasVencidas: [],
+  faturasVencidasList: [],
   faturamentoMensal: 142800,
   crescimentoMensal: 22.4,
   clientesAtivos: 84,

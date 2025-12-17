@@ -267,7 +267,7 @@ export interface DashboardRecebiveis {
   // Próximas ações
   notificacoesAgendadas: number;
   faturas3Dias: Invoice[];
-  faturasVencidas: Invoice[];
+  faturasVencidasList: Invoice[];
   
   // Performance
   faturamentoMensal: number;

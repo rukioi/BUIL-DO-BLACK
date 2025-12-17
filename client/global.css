@@ -1,3 +1,6 @@
+/* TIPOGRAFIA - Deve estar antes de tudo */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -18,9 +21,6 @@
 .smooth-transition {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-/* TIPOGRAFIA */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
 
 /* BASE THEME - Dark Elegant com Roxo */
 @layer base {
