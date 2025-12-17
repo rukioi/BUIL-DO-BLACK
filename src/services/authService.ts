@@ -52,20 +52,27 @@ export class AuthService {
       audience: 'legalsaas-users'
     });
 
-    // Store refresh token in database
-    const tokenHash = await bcrypt.hash(refreshToken, 10);
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
+    // Verificar se é usuário demo - não salvar refresh token no banco
+    const isDemoUser = user.id === 'demo-user-id';
+    
+    if (!isDemoUser) {
+      // Store refresh token in database apenas para usuários reais
+      const tokenHash = await bcrypt.hash(refreshToken, 10);
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
 
-    try {
-      await database.createRefreshToken({
-        tokenHash,
-        userId: user.id,
-        expiresAt: expiresAt.toISOString(),
-        isActive: true
-      });
-    } catch (error) {
-      console.error('Error storing refresh token:', error);
+      try {
+        await database.createRefreshToken({
+          tokenHash,
+          userId: user.id,
+          expiresAt: expiresAt.toISOString(),
+          isActive: true
+        });
+      } catch (error) {
+        console.error('Error storing refresh token:', error);
+      }
+    } else {
+      console.log('🔓 Usuário demo - refresh token não será salvo no banco');
     }
 
     return { accessToken, refreshToken };
@@ -114,40 +121,85 @@ export class AuthService {
   async refreshTokens(refreshToken: string) {
     const decoded = await this.verifyRefreshToken(refreshToken);
     
-    // Get fresh user data
-    const user = await database.findUserByEmail(decoded.email);
-    if (!user || !user.isActive) {
-      throw new Error('User not found or inactive');
-    }
-
-    // Revoke old refresh token by finding the matching one
-    const userId = (decoded as any).userId;
-    const userTokens = await database.getActiveRefreshTokensForUser(userId);
+    // Verificar se é usuário demo
+    const isDemoUser = decoded.userId === 'demo-user-id';
     
-    for (const storedToken of userTokens) {
-      if (await bcrypt.compare(refreshToken, storedToken.tokenHash)) {
-        await database.revokeRefreshTokenById(storedToken.id);
-        break;
+    if (isDemoUser) {
+      console.log('🔓 Refresh token para usuário demo');
+      // Criar usuário mock para demonstração
+      const demoUser = {
+        id: 'demo-user-id',
+        email: 'admin@escritorio.com',
+        name: 'Dr. Administrador Demo',
+        accountType: 'GERENCIAL',
+        tenantId: 'demo-tenant-id',
+        isActive: true,
+        lastLogin: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      // Generate new tokens
+      const tokens = await this.generateTokens(demoUser);
+      
+      const cleanUser = {
+        id: demoUser.id,
+        email: demoUser.email,
+        name: demoUser.name,
+        accountType: demoUser.accountType,
+        tenantId: demoUser.tenantId,
+        isActive: demoUser.isActive,
+        lastLogin: demoUser.lastLogin,
+        createdAt: demoUser.createdAt,
+        updatedAt: demoUser.updatedAt
+      };
+      
+      return { user: cleanUser, tokens };
+    }
+    
+    // Get fresh user data for regular users
+    try {
+      const user = await database.findUserByEmail(decoded.email);
+      if (!user || !user.isActive) {
+        throw new Error('User not found or inactive');
       }
-    }
 
-    // Generate new tokens
-    const tokens = await this.generateTokens(user);
-    
-    // Clean user object to remove BigInt values
-    const cleanUser = {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      accountType: user.accountType || user.account_type,
-      tenantId: user.tenantId || user.tenant_id,
-      isActive: user.isActive,
-      lastLogin: user.lastLogin,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt
-    };
-    
-    return { user: cleanUser, tokens };
+      // Revoke old refresh token by finding the matching one
+      const userId = (decoded as any).userId;
+      const userTokens = await database.getActiveRefreshTokensForUser(userId);
+      
+      for (const storedToken of userTokens) {
+        if (await bcrypt.compare(refreshToken, storedToken.tokenHash)) {
+          await database.revokeRefreshTokenById(storedToken.id);
+          break;
+        }
+      }
+
+      // Generate new tokens
+      const tokens = await this.generateTokens(user);
+      
+      // Clean user object to remove BigInt values
+      const cleanUser = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        accountType: user.accountType || user.account_type,
+        tenantId: user.tenantId || user.tenant_id,
+        isActive: user.isActive,
+        lastLogin: user.lastLogin,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      };
+      
+      return { user: cleanUser, tokens };
+    } catch (error) {
+      // Se o erro for de conexão com banco, retornar erro genérico
+      if (error instanceof Error && error.message.includes('Can\'t reach database')) {
+        console.error('Database connection error during token refresh:', error.message);
+        throw new Error('Token refresh failed');
+      }
+      throw error;
+    }
   }
 
   async revokeAllTokens(userId: string, isAdmin: boolean = false) {

@@ -9,7 +9,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Scale, Eye, EyeOff, Mail, Lock, User, Key, AlertCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 const loginSchema = z.object({
   email: z.string().email('Email inválido'),
@@ -69,53 +70,36 @@ export function Login() {
     },
   });
 
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const handleLogin = async (data: LoginFormData) => {
     setIsLoading(true);
     setErrorMessage('');
+    setSuccessMessage('');
 
     try {
-      console.log('Attempting login with:', data.email);
-
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      console.log('Login response status:', response.status);
-
-      const result = await response.json();
-      console.log('Login response data:', result);
-
-      if (response.ok) {
-        // Store tokens
-        localStorage.setItem('access_token', result.tokens.accessToken);
-        localStorage.setItem('refresh_token', result.tokens.refreshToken);
-
-        setSuccessMessage('Login realizado com sucesso! Redirecionando...');
-
-        // Reload page to trigger AuthProvider to pick up the tokens
-        window.location.href = '/';
-      } else {
-        // Improved error handling for expired plan
-        const errorMessage = result.error || 'Email ou senha incorretos';
-        const errorType = result.errorType; // Assuming your API returns an errorType field
-
-        if (errorType === 'Plano expirado') {
-          setErrorMessage('🔒 Plano expirado! Sua conta não está mais ativa. Entre em contato com o administrador para renovar.');
-        } else {
-          setErrorMessage(errorMessage);
-        }
-      }
+      console.log('🔐 Attempting login with:', data.email);
+      await login(data.email, data.password);
+      
+      console.log('✅ Login successful, redirecting...');
+      setSuccessMessage('Login realizado com sucesso! Redirecionando...');
+      
+      // Usar navigate em vez de window.location.href para evitar reload completo
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 500);
     } catch (error: any) {
-      console.error('Login error:', error);
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to login';
-      const errorType = error.response?.data?.error;
+      console.error('❌ Login error:', error);
+      
+      // Improved error handling for expired plan
+      const errorMessage = error?.message || error?.response?.data?.error || 'Email ou senha incorretos';
+      const errorType = error?.response?.data?.errorType || error?.response?.data?.error;
 
-      if (errorType === 'Plano expirado') {
+      if (errorType === 'Plano expirado' || errorMessage.includes('Plano expirado')) {
         setErrorMessage('🔒 Plano expirado! Sua conta não está mais ativa. Entre em contato com o administrador para renovar.');
+      } else if (errorMessage.includes('Renove Sua Conta')) {
+        setErrorMessage('🔒 Renove Sua Conta ou Entre em contato com o Administrador do Sistema');
       } else {
         setErrorMessage(errorMessage);
       }
@@ -201,11 +185,11 @@ export function Login() {
               Entre com sua conta ou crie uma nova para começar
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="login">Entrar</TabsTrigger>
-                <TabsTrigger value="register">Registrar</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="login" className="w-full">Entrar</TabsTrigger>
+                <TabsTrigger value="register" className="w-full">Registrar</TabsTrigger>
               </TabsList>
 
               {/* Mensagens de Sucesso/Erro */}
@@ -230,37 +214,38 @@ export function Login() {
               <TabsContent value="login" className="space-y-4 mt-6">
                 <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="login-email">Email</Label>
+                    <Label htmlFor="login-email" className="text-sm font-medium">Email</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                       <Input
                         id="login-email"
                         type="email"
-                        placeholder="seu@email.com"
-                        className="pl-10"
+                        placeholder="eu@email.com"
+                        className="pl-11 pr-3 w-full"
                         {...loginForm.register('email')}
                       />
                     </div>
                     {loginForm.formState.errors.email && (
-                      <p className="text-sm text-red-600">{loginForm.formState.errors.email.message}</p>
+                      <p className="text-sm text-red-600 mt-1">{loginForm.formState.errors.email.message}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="login-password">Senha</Label>
+                    <Label htmlFor="login-password" className="text-sm font-medium">Senha</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                       <Input
                         id="login-password"
                         type={showPassword ? 'text' : 'password'}
-                        placeholder="Sua senha"
-                        className="pl-10 pr-10"
+                        placeholder="sua senha"
+                        className="pl-11 pr-11 w-full"
                         {...loginForm.register('password')}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 hover:opacity-70 transition-opacity focus:outline-none"
+                        tabIndex={0}
                       >
                         {showPassword ? (
                           <EyeOff className="h-4 w-4 text-gray-400" />
@@ -270,23 +255,21 @@ export function Login() {
                       </button>
                     </div>
                     {loginForm.formState.errors.password && (
-                      <p className="text-sm text-red-600">{loginForm.formState.errors.password.message}</p>
+                      <p className="text-sm text-red-600 mt-1">{loginForm.formState.errors.password.message}</p>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm">
-                      <button
-                        type="button"
-                        onClick={() => setActiveTab('forgot-password')}
-                        className="text-blue-600 hover:text-blue-500"
-                      >
-                        Esqueceu sua senha?
-                      </button>
-                    </div>
+                  <div className="flex items-center justify-between pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('forgot-password')}
+                      className="text-sm text-blue-600 hover:text-blue-500 transition-colors"
+                    >
+                      Esqueceu sua senha?
+                    </button>
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full mt-4" disabled={isLoading}>
                     {isLoading ? 'Entrando...' : 'Entrar'}
                   </Button>
 
@@ -303,51 +286,51 @@ export function Login() {
               <TabsContent value="register" className="space-y-4 mt-6">
                 <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="register-name">Nome Completo</Label>
+                    <Label htmlFor="register-name" className="text-sm font-medium">Nome Completo</Label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                       <Input
                         id="register-name"
                         placeholder="Seu nome completo"
-                        className="pl-10"
+                        className="pl-11 pr-3 w-full"
                         {...registerForm.register('name')}
                       />
                     </div>
                     {registerForm.formState.errors.name && (
-                      <p className="text-sm text-red-600">{registerForm.formState.errors.name.message}</p>
+                      <p className="text-sm text-red-600 mt-1">{registerForm.formState.errors.name.message}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="register-email">Email</Label>
+                    <Label htmlFor="register-email" className="text-sm font-medium">Email</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                       <Input
                         id="register-email"
                         type="email"
                         placeholder="seu@email.com"
-                        className="pl-10"
+                        className="pl-11 pr-3 w-full"
                         {...registerForm.register('email')}
                       />
                     </div>
                     {registerForm.formState.errors.email && (
-                      <p className="text-sm text-red-600">{registerForm.formState.errors.email.message}</p>
+                      <p className="text-sm text-red-600 mt-1">{registerForm.formState.errors.email.message}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="registration-key">Chave de Registro</Label>
+                    <Label htmlFor="registration-key" className="text-sm font-medium">Chave de Registro</Label>
                     <div className="relative">
-                      <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                       <Input
                         id="registration-key"
                         placeholder="Insira sua chave de registro"
-                        className="pl-10"
+                        className="pl-11 pr-3 w-full"
                         {...registerForm.register('key')}
                       />
                     </div>
                     {registerForm.formState.errors.key && (
-                      <p className="text-sm text-red-600">{registerForm.formState.errors.key.message}</p>
+                      <p className="text-sm text-red-600 mt-1">{registerForm.formState.errors.key.message}</p>
                     )}
                     <p className="text-xs text-gray-500 mt-1">
                       Entre em contato com o administrador para obter sua chave de registro
@@ -355,20 +338,21 @@ export function Login() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="register-password">Senha</Label>
+                    <Label htmlFor="register-password" className="text-sm font-medium">Senha</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                       <Input
                         id="register-password"
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Mínimo 8 caracteres"
-                        className="pl-10 pr-10"
+                        className="pl-11 pr-11 w-full"
                         {...registerForm.register('password')}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 hover:opacity-70 transition-opacity focus:outline-none"
+                        tabIndex={0}
                       >
                         {showPassword ? (
                           <EyeOff className="h-4 w-4 text-gray-400" />
@@ -378,25 +362,26 @@ export function Login() {
                       </button>
                     </div>
                     {registerForm.formState.errors.password && (
-                      <p className="text-sm text-red-600">{registerForm.formState.errors.password.message}</p>
+                      <p className="text-sm text-red-600 mt-1">{registerForm.formState.errors.password.message}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirmar Senha</Label>
+                    <Label htmlFor="confirm-password" className="text-sm font-medium">Confirmar Senha</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                       <Input
                         id="confirm-password"
                         type={showConfirmPassword ? 'text' : 'password'}
                         placeholder="Confirme sua senha"
-                        className="pl-10 pr-10"
+                        className="pl-11 pr-11 w-full"
                         {...registerForm.register('confirmPassword')}
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 hover:opacity-70 transition-opacity focus:outline-none"
+                        tabIndex={0}
                       >
                         {showConfirmPassword ? (
                           <EyeOff className="h-4 w-4 text-gray-400" />
@@ -406,11 +391,11 @@ export function Login() {
                       </button>
                     </div>
                     {registerForm.formState.errors.confirmPassword && (
-                      <p className="text-sm text-red-600">{registerForm.formState.errors.confirmPassword.message}</p>
+                      <p className="text-sm text-red-600 mt-1">{registerForm.formState.errors.confirmPassword.message}</p>
                     )}
                   </div>
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full mt-4" disabled={isLoading}>
                     {isLoading ? 'Criando conta...' : 'Criar conta'}
                   </Button>
                 </form>
@@ -428,19 +413,19 @@ export function Login() {
 
                   <form onSubmit={forgotPasswordForm.handleSubmit(handleForgotPassword)} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="forgot-email">Email</Label>
+                      <Label htmlFor="forgot-email" className="text-sm font-medium">Email</Label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
                         <Input
                           id="forgot-email"
                           type="email"
                           placeholder="seu@email.com"
-                          className="pl-10"
+                          className="pl-11 pr-3 w-full"
                           {...forgotPasswordForm.register('email')}
                         />
                       </div>
                       {forgotPasswordForm.formState.errors.email && (
-                        <p className="text-sm text-red-600">{forgotPasswordForm.formState.errors.email.message}</p>
+                        <p className="text-sm text-red-600 mt-1">{forgotPasswordForm.formState.errors.email.message}</p>
                       )}
                     </div>
 

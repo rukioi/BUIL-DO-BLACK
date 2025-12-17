@@ -155,23 +155,25 @@ export class AuthController {
 
   async getProfile(req: Request, res: Response) {
     try {
-      const userId = (req as any).user?.id;
+      const user = (req as any).user;
+      const tenantId = (req as any).tenantId;
 
-      if (!userId) {
+      if (!user || !user.id) {
         return res.status(401).json({ error: 'Authentication required' });
       }
 
-      // Return user profile
-      const user = {
-        id: userId,
-        email: (req as any).user?.email || 'user@example.com',
-        name: (req as any).user?.name || 'User',
-        accountType: (req as any).user?.accountType || 'SIMPLES',
-        tenantId: (req as any).user?.tenantId || (req as any).tenantId || 'default',
-        tenantName: 'Default Tenant',
+      // Return user profile (suporta usuário demo)
+      const userProfile = {
+        id: user.id,
+        email: user.email || 'user@example.com',
+        name: user.name || 'User',
+        accountType: user.accountType || 'SIMPLES',
+        tenantId: user.tenantId || tenantId || 'default',
+        tenantName: user.id === 'demo-user-id' ? 'Demo Tenant' : 'Default Tenant',
       };
 
-      res.json({ user });
+      console.log('Get profile response:', { userId: userProfile.id, accountType: userProfile.accountType });
+      res.json({ user: userProfile });
     } catch (error) {
       console.error('Get profile error:', error);
       res.status(500).json({

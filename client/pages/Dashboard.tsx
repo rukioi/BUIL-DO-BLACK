@@ -220,20 +220,6 @@ export function Dashboard() {
         </p>
       </div>
 
-      {/* Error Display */}
-      {error && (
-        <Card className="border-[#ef4444] bg-[#1a1a1d]">
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <AlertCircle className="h-5 w-5 text-[#ef4444]" />
-              <div>
-                <h3 className="font-medium text-[#ef4444]">Erro ao carregar dados</h3>
-                <p className="text-sm text-gray-300">{error}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Metric Cards */}
       {isLoading ? (

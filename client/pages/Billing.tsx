@@ -1048,14 +1048,14 @@ export function Billing() {
         </div>
 
         {/* Documents Table with Tabs */}
-        <Card>
-          <CardHeader>
+        <Card className="border-0 shadow-none">
+          <CardHeader className="pb-4">
             <CardTitle className="flex items-center">
               <FileText className="h-5 w-5 mr-2" />
               Documentos de Cobrança ({filteredDocuments.length})
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0 pb-0">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList>
                 <TabsTrigger value="all">

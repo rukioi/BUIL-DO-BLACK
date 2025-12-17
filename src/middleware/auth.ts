@@ -99,15 +99,19 @@ export const authenticateToken = async (req: AuthenticatedRequest, res: Response
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
+      console.log('❌ No token provided in Authorization header');
       return res.status(401).json({ error: 'Access token required' });
     }
 
+    console.log('🔍 Verifying token...', token.substring(0, 20) + '...');
+
     // CORRIGIDO: Usar AuthService.verifyAccessToken para validação consistente
     const decoded = await authService.verifyAccessToken(token);
+    console.log('✅ Token decoded:', { userId: decoded.userId, email: decoded.email, accountType: decoded.accountType });
 
     // Validar se o usuário tem tenantId (não é admin)
     if (!decoded.role && !decoded.tenantId) {
-      console.error('Token without tenantId for regular user:', decoded.userId);
+      console.error('❌ Token without tenantId for regular user:', decoded.userId);
       return res.status(403).json({ error: 'Invalid token: missing tenant information' });
     }
 
@@ -125,6 +129,7 @@ export const authenticateToken = async (req: AuthenticatedRequest, res: Response
         name: String(decoded.name || 'Dr. Administrador Demo'),
       };
       req.tenantId = String(decoded.tenantId || 'demo-tenant-id');
+      console.log('✅ Demo user authenticated:', req.user);
       return next();
     }
 

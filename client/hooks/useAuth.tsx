@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const token = localStorage.getItem('access_token');
       if (!token) {
-        console.log('No access token found');
+        console.log('❌ No access token found');
         setIsLoading(false);
         return;
       }
@@ -49,27 +49,77 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Set token in apiService
       apiService.setToken(token);
 
-      console.log('Checking auth status with token...');
+      console.log('🔍 Checking auth status with token...', token.substring(0, 20) + '...');
       const response = await apiService.getProfile();
-      console.log('Auth check successful:', response.user);
+      console.log('✅ Auth check successful:', response.user);
       setUser(response.user);
-    } catch (error) {
-      console.error('Auth check failed:', error);
+    } catch (error: any) {
+      console.error('❌ Auth check failed:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        status: error?.response?.status,
+        type: typeof error
+      });
 
-      // Try to refresh token first
+      // Verificar se é realmente um erro de autenticação
+      const errorMessage = error?.message || '';
+      const isAuthError = errorMessage.includes('401') || 
+                         errorMessage.includes('403') ||
+                         errorMessage.includes('Authentication') ||
+                         errorMessage.includes('Invalid token') ||
+                         errorMessage.includes('Access token required') ||
+                         error?.response?.status === 401 ||
+                         error?.response?.status === 403;
+      
+      // Se não for erro de autenticação, manter o usuário logado
+      if (!isAuthError) {
+        console.log('⚠️ Erro não relacionado à autenticação, mantendo sessão');
+        // Tentar obter o usuário do token decodificado se possível
+        const token = localStorage.getItem('access_token');
+        if (token) {
+          try {
+            // Decodificar token sem verificar (apenas para obter dados do usuário)
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            if (payload.userId === 'demo-user-id') {
+              setUser({
+                id: payload.userId,
+                email: payload.email,
+                name: payload.name || 'Dr. Administrador Demo',
+                accountType: payload.accountType || 'GERENCIAL',
+                tenantId: payload.tenantId || 'demo-tenant-id',
+                tenantName: 'Demo Tenant',
+              });
+              setIsLoading(false);
+              return;
+            }
+          } catch (decodeError) {
+            console.error('Erro ao decodificar token:', decodeError);
+          }
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // Try to refresh token first (only if it's an auth error)
       const refreshToken = localStorage.getItem('refresh_token');
-      if (refreshToken && (error?.response?.status === 401 || error?.response?.status === 403)) {
+      
+      if (refreshToken && isAuthError) {
         try {
-          console.log('Attempting token refresh...');
+          console.log('🔄 Attempting token refresh...');
           const refreshResponse = await apiService.refreshToken(refreshToken);
-          setUser(refreshResponse.user);
-          return;
+          if (refreshResponse && refreshResponse.user) {
+            console.log('✅ Token refresh successful');
+            setUser(refreshResponse.user);
+            setIsLoading(false);
+            return;
+          }
         } catch (refreshError) {
-          console.error('Token refresh failed:', refreshError);
+          console.error('❌ Token refresh failed:', refreshError);
         }
       }
 
-      // Clear tokens if refresh failed or no refresh token
+      // Clear tokens only if it's really an auth error and refresh failed
+      console.log('🧹 Clearing tokens due to authentication failure');
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       apiService.clearToken();
@@ -81,21 +131,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
+      console.log('🔐 useAuth.login called with:', email);
       const response = await apiService.login(email, password);
+      console.log('✅ Login response received:', response);
       setUser(response.user);
+      console.log('✅ User set in context:', response.user);
     } catch (err: any) {
-        const errorData = err.response?.data;
-        let errorMessage = err.response?.data?.error || err.message || 'Login failed';
+      console.error('❌ Login error in useAuth:', err);
+      const errorData = err.response?.data;
+      let errorMessage = err.response?.data?.error || err.message || 'Login failed';
 
-        // Verificar se é erro de tenant inativo
-        if (errorData?.code === 'TENANT_INACTIVE' || errorMessage.includes('Renove Sua Conta')) {
-          errorMessage = 'Renove Sua Conta ou Entre em contato com o Administrador do Sistema';
-        }
-
-        setError(errorMessage);
-      } finally {
-        setIsLoading(false);
+      // Verificar se é erro de tenant inativo
+      if (errorData?.code === 'TENANT_INACTIVE' || errorMessage.includes('Renove Sua Conta')) {
+        errorMessage = 'Renove Sua Conta ou Entre em contato com o Administrador do Sistema';
       }
+
+      // Re-throw para que o componente possa tratar
+      throw new Error(errorMessage);
+    }
   };
 
   const register = async (email: string, password: string, name: string, key: string) => {

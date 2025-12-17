@@ -36,7 +36,7 @@ class ApiService {
 
       if (response.status === 401) {
         // Token expired, try to refresh
-        const refreshed = await this.refreshToken();
+        const refreshed = await this.refreshTokenInternal();
         if (refreshed) {
           // Retry with new token
           config.headers = {
@@ -49,9 +49,10 @@ class ApiService {
           }
           return retryResponse.json();
         } else {
-          // Redirect to login
-          window.location.href = '/login';
-          throw new Error('Authentication required');
+          // Não redirecionar automaticamente - deixar o componente de rota lidar com isso
+          // Isso evita redirecionamentos durante checkAuthStatus
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Authentication required');
         }
       }
 
@@ -74,7 +75,7 @@ class ApiService {
     }
   }
 
-  private async refreshToken(): Promise<boolean> {
+  private async refreshTokenInternal(): Promise<boolean> {
     try {
       const refreshToken = localStorage.getItem('refresh_token');
       if (!refreshToken) return false;
@@ -97,6 +98,18 @@ class ApiService {
     }
 
     return false;
+  }
+
+  async refreshToken(token: string) {
+    const response = await this.request('/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken: token }),
+    });
+
+    this.setToken(response.tokens.accessToken);
+    localStorage.setItem('refresh_token', response.tokens.refreshToken);
+
+    return response;
   }
 
   clearToken() {
