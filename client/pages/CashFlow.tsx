@@ -158,12 +158,14 @@ export function CashFlow() {
    * - Receitas totais do período
    * - Despesas totais do período
    * - Saldo atual (receitas - despesas)
-   * - Crescimento mensal
+   * - Crescimento mensal (comparando com mês anterior)
    * - Transações pendentes
    */
   const stats = useMemo(() => {
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
+    const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const previousYear = currentMonth === 0 ? currentYear - 1 : currentYear;
 
     // Filtrar transações do mês atual
     const currentMonthTransactions = transactions.filter(t => {
@@ -172,7 +174,14 @@ export function CashFlow() {
              transactionDate.getFullYear() === currentYear;
     });
 
-    // Calcular totais
+    // Filtrar transações do mês anterior
+    const previousMonthTransactions = transactions.filter(t => {
+      const transactionDate = new Date(t.date);
+      return transactionDate.getMonth() === previousMonth && 
+             transactionDate.getFullYear() === previousYear;
+    });
+
+    // Calcular totais do mês atual
     const totalIncome = currentMonthTransactions
       .filter(t => t.type === 'income' && t.status === 'confirmed')
       .reduce((sum, t) => sum + t.amount, 0);
@@ -183,18 +192,36 @@ export function CashFlow() {
 
     const balance = totalIncome - totalExpenses;
 
+    // Calcular totais do mês anterior para crescimento
+    const previousMonthIncome = previousMonthTransactions
+      .filter(t => t.type === 'income' && t.status === 'confirmed')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const previousMonthExpenses = previousMonthTransactions
+      .filter(t => t.type === 'expense' && t.status === 'confirmed')
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const previousMonthBalance = previousMonthIncome - previousMonthExpenses;
+
+    // Calcular crescimento percentual
+    // Crescimento = ((Saldo Atual - Saldo Anterior) / Saldo Anterior) * 100
+    let growth = 0;
+    if (previousMonthBalance !== 0) {
+      growth = ((balance - previousMonthBalance) / Math.abs(previousMonthBalance)) * 100;
+    } else if (balance > 0) {
+      // Se não havia saldo no mês anterior e agora há, crescimento é 100%
+      growth = 100;
+    }
+
     // Transações pendentes
     const pendingTransactions = transactions.filter(t => t.status === 'pending').length;
-
-    // Crescimento (mock - em produção seria calculado comparando com mês anterior)
-    const growth = 15.2; // Percentual de crescimento
 
     return {
       totalIncome,
       totalExpenses,
       balance,
       pendingTransactions,
-      growth,
+      growth: Math.round(growth * 10) / 10, // Arredondar para 1 casa decimal
       transactionCount: currentMonthTransactions.length,
     };
   }, [transactions]);
