@@ -314,10 +314,10 @@ export function Notifications() {
               <div className="space-y-2">
                 <label className="text-sm font-medium">Buscar</label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
                     placeholder="Buscar notificações..."
-                    className="pl-10"
+                    className="pl-11 pr-3"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />

@@ -79,12 +79,11 @@
     @apply rounded-2xl relative bg-[#1a1a1d]
       shadow-[0_8px_32px_rgba(0,0,0,0.8)] hover:shadow-[0_12px_48px_rgba(147,51,234,0.35)]
       transition-all duration-300;
-    border: 2px solid #27272a !important;
-    padding: 0 !important;
+    border: 2px solid #27272a;
   }
 
   .ui-card:hover {
-    border-color: #3f3f46 !important;
+    border-color: #3f3f46;
     transform: translateY(-2px);
   }
 
@@ -101,9 +100,8 @@
   /* BUTTON - ESTILO PREMIUM */
   .ui-btn {
     @apply inline-flex items-center justify-center rounded-xl font-semibold smooth-transition
-      border-0 outline-none ring-0 focus:ring-0 focus:outline-none;
-    padding: 10px 20px !important;
-    font-size: 14px !important;
+      border-0 outline-none ring-0 focus:ring-0 focus:outline-none px-5 py-2.5;
+    font-size: 14px;
     letter-spacing: 0.3px;
   }
 
@@ -122,13 +120,13 @@
   }
 
   .ui-btn-outline {
-    @apply text-[var(--accent)] bg-[#1a1a1d] hover:text-[var(--accent-hover)] hover:bg-[#27272a];
-    border: 2px solid var(--accent) !important;
+    @apply text-[var(--accent)] bg-[#1a1a1d] hover:text-[var(--accent-hover)] hover:bg-[#27272a] border-2;
+    border-color: var(--accent);
     box-shadow: 0 0 15px rgba(147, 51, 234, 0.2);
   }
 
   .ui-btn-outline:hover {
-    border-color: var(--accent-hover) !important;
+    border-color: var(--accent-hover);
     box-shadow: 0 0 25px rgba(147, 51, 234, 0.3);
   }
 
@@ -158,16 +156,23 @@
     box-shadow: 0 4px 16px rgba(147, 51, 234, 0.3), 0 0 20px rgba(147, 51, 234, 0.15);
   }
 
-  /* TABS - ESTILO PREMIUM */
+  /* TABS - ESTILO PREMIUM (apenas para uso manual com classes .ui-tabs) */
+  /* NOTA: Componentes Radix Tabs não usam essas classes, elas são apenas para referência */
   .ui-tabs {
-    @apply flex gap-2 bg-[#27272a] p-1.5 rounded-xl text-gray-400 border-2 border-[#3f3f46];
+    @apply flex items-stretch bg-[#27272a] rounded-xl border-2 border-[#3f3f46];
+    height: 40px;
+    padding: 0;
+    gap: 2px;
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
   }
 
+  .ui-tab {
+    @apply flex items-center justify-center h-full px-4 text-gray-400 rounded-lg font-medium;
+  }
+
   .ui-tab-active {
-    @apply bg-[#1a1a1d] text-[var(--accent)] rounded-lg border-0;
+    @apply h-full bg-[#1a1a1d] text-[var(--accent)] rounded-lg font-semibold;
     box-shadow: 0 2px 12px rgba(147, 51, 234, 0.3), 0 0 20px rgba(147, 51, 234, 0.15);
-    font-weight: 600;
   }
 
   /* BADGES - ESTILO PREMIUM */
@@ -332,18 +337,18 @@ tbody .ui-btn {
    SHADCN/UI — SOBRESCREVER BORDAS, OUTLINES, RINGS
    ================================================================ */
 
-.card,
-[class*="card"] {
+/* Cards - apenas se não tiver padding definido */
+.card:not([class*="p-"]):not([class*="px-"]):not([class*="py-"]),
+[class*="card"]:not([class*="p-"]):not([class*="px-"]):not([class*="py-"]) {
   @apply bg-[#1a1a1d] border-2 border-[#27272a] rounded-2xl;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.8), 0 0 30px rgba(147,51,234,0.15) !important;
-  padding: 0 !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.8), 0 0 30px rgba(147,51,234,0.15);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card:hover,
 [class*="card"]:hover {
-  border-color: #3f3f46 !important;
-  box-shadow: 0 12px 48px rgba(0,0,0,0.9), 0 0 40px rgba(147,51,234,0.25) !important;
+  border-color: #3f3f46;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.9), 0 0 40px rgba(147,51,234,0.25);
   transform: translateY(-2px);
 }
 
@@ -353,11 +358,13 @@ button,
   @apply border-0 outline-none ring-0 focus:ring-0 focus:outline-none shadow-none;
 }
 
+/* Inputs base - apenas estilos visuais básicos */
+/* Padding deve ser gerenciado pelos componentes individuais ou classes Tailwind */
+/* Isso permite que classes como pl-11, px-4, etc. funcionem corretamente */
 [data-radix-input],
 input,
 .ui-input {
   @apply bg-[#27272a] border-2 border-[#3f3f46] outline-none ring-0 rounded-xl;
-  padding: 12px 16px !important;
   font-size: 14px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -374,8 +381,7 @@ input:focus,
 
 .select-trigger,
 [data-radix-select-trigger] {
-  @apply bg-[#27272a] border-2 border-[#3f3f46] outline-none ring-0 rounded-xl;
-  padding: 12px 16px !important;
+  @apply bg-[#27272a] border-2 border-[#3f3f46] outline-none ring-0 rounded-xl px-4 py-3;
   font-size: 14px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

@@ -86,7 +86,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     }
   };
 
-  const handleLogout = () => window.logout();
+  const handleLogout = () => (window as any).logout();
   const handleViewProfile = () => setShowProfileDialog(true);
   const handleSettings = () => navigate("/configuracoes");
 
@@ -165,10 +165,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="flex-1 max-w-md">
               <form onSubmit={handleSearch}>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" />
                   <Input
                     placeholder="Buscar clientes, projetos, faturas..."
-                    className="pl-10 bg-[#27272a] border border-[#3f3f46] text-gray-200 placeholder:text-gray-500 focus:border-[#9333ea]"
+                    className="pl-11 pr-3 bg-[#27272a] border border-[#3f3f46] text-gray-200 placeholder:text-gray-500 focus:border-[#9333ea]"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
