@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { existsSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,15 +53,36 @@ export function createApp() {
   app.use('/api/notifications', notificationsRoutes);
   app.use('/api/publications', publicationsRoutes);
 
-  // Serve static files in production
-  if (process.env.NODE_ENV === 'production') {
-    const spaPath = path.join(__dirname, '../spa');
+  // Serve static files from dist/spa
+  const spaPath = path.join(__dirname, 'spa');
+  console.log('📁 Attempting to serve static files from:', spaPath);
+  console.log('📁 __dirname:', __dirname);
+  console.log('📁 SPA exists:', existsSync(spaPath));
+  
+  // Always try to serve static files if directory exists
+  if (existsSync(spaPath)) {
+    console.log('✅ SPA directory found, serving static files');
     app.use(express.static(spaPath));
     
     // SPA fallback - serve index.html for all non-API routes
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(spaPath, 'index.html'));
+    app.get('*', (req, res, next) => {
+      // Skip API routes
+      if (req.path.startsWith('/api')) {
+        return next();
+      }
+      const indexPath = path.join(spaPath, 'index.html');
+      console.log('📄 Serving index.html for path:', req.path);
+      res.sendFile(indexPath, (err) => {
+        if (err) {
+          console.error('❌ Error serving index.html:', err.message);
+          console.error('❌ Full error:', err);
+          next(err);
+        }
+      });
     });
+  } else {
+    console.log('⚠️ SPA directory not found at:', spaPath);
+    console.log('⚠️ Current working directory:', process.cwd());
   }
 
   // Error handler
